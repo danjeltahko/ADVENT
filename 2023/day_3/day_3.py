@@ -34,6 +34,26 @@ def is_valid(x, y, matrix):
         return False
 
 
+def gear_ratio(matrix, numbers, gears):
+    sum = 0
+    gear_number = []
+    for x, y in gears:
+        for i in range(x - 1, x + 2):
+            for j in range(y - 1, y + 2):
+                if not is_valid(i, j, matrix):
+                    continue
+                if matrix[i][j].isdigit():
+                    for number in numbers:
+                        if i == int(number[1]) and j in number[2]:
+                            if number not in gear_number:
+                                gear_number.append(number)
+        if len(gear_number) == 2:
+            sum += int(gear_number[0][0]) * int(gear_number[1][0])
+        gear_number = []
+
+    print(sum)
+
+
 def is_part(matrix, x, index):
     symbols = ["+", "*", "=", "-", "&", "#", "/", "%", "$", "@"]
     is_symbol = False
@@ -44,9 +64,6 @@ def is_part(matrix, x, index):
                 continue
             if matrix[i][y] in symbols:
                 is_symbol = True
-            if matrix[i][y] == '*' and i >= x:
-                
-
 
     return is_symbol
 
@@ -56,6 +73,7 @@ def calculate_schematics(matrix: list[list[str]]):
     break_point = [".", "+", "*", "=", "-", "&", "#", "/", "%", "$", "@"]
     digit = ""
     index = []
+    gear = []
     for x, row in enumerate(matrix):
         for y, char in enumerate(row):
             if char.isdigit():
@@ -64,31 +82,32 @@ def calculate_schematics(matrix: list[list[str]]):
 
             if char in break_point and len(digit) > 0:
                 if is_part(matrix, x, index):
-                    numbers.append(digit)
+                    numbers.append([digit, x, index])
                 digit = ""
                 index = []
+
+            if char == "*":
+                gear.append((x, y))
+
         # fucking hell this fucking fuck shit took me fucking hours fucking fuck
         if len(digit) > 0 and is_part(matrix, x, index):
-            numbers.append(digit)
+            numbers.append([digit, x, index])
+
         digit = ""
         index = []
-    return numbers
+    return numbers, gear
 
 
 def engine_schematic() -> None:
-    # with open("day_3_input.txt", "r") as file:
-    matrix = []
-    for line in example2:
-        # matrix = [list(line.strip()) for line in file.readlines()]
-        matrix.append(line)
-    value = calculate_schematics(matrix)
-    # print(value)
-    # print(len(value))
+    with open("day_3_input.txt", "r") as file:
+        matrix = [list(line.strip()) for line in file.readlines()]
+        value, gear = calculate_schematics(matrix)
     sum = 0
     for i in value:
-        # print(i)
-        sum += int(i)
+        sum += int(i[0])
     print(sum)
+
+    gear_ratio(matrix, value, gear)
 
 
 if __name__ == "__main__":
