@@ -54,8 +54,8 @@ local function read_file(file_path)
     score2 = score2 + strip2(line)
     i = i + 1
   end
-  print("score " .. score)
-  print("score2 " .. score2)
+  print("score " .. score, "2149")
+  print("score2 " .. score2, "71274")
 end
 
 read_file("day_2_input.txt")
