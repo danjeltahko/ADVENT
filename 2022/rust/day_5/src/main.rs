@@ -49,30 +49,7 @@ fn moving_schedule(line: &str) -> (u8, u8, u8){
     return (order[0], order[1], order[2])
 }
 
-fn main() {
-
-    let contents = fs::read_to_string("puzzle.txt")
-        .expect("Something went wrong reading the file.");
-
-    let mut orders = Vec::new();
-    
-    // Read the first lines until whitespace
-    // to be able to create the puzzle stack
-    let mut stacks = Vec::new();
-    let mut order_flag = false;
-    for line in contents.lines() {
-        if order_flag {
-            orders.push(line)
-        } else {
-            if line.is_empty() {
-                order_flag = true;
-            } else {
-                stacks.push(line);
-            }
-        } 
-    }
-    let mut stack: HashMap<char, Vec<char>> = create_stacks(&stacks);
-    
+fn cratemover9000(orders: &Vec<&str>, mut stack: HashMap<char, Vec<char>>) -> HashMap<char, Vec<char>> {
     // Iterate through all the lines with orders
     for line in orders {
         // Get the scheduled tuple
@@ -86,6 +63,38 @@ fn main() {
             stack.get_mut(&to_char).unwrap().push(container);
         }
     }
+    return stack
+}
+
+fn cratemover9001(orders: &Vec<&str>, mut stack: HashMap<char, Vec<char>>) -> HashMap<char, Vec<char>> {
+    // In the second part of the puzzle we see that it's a newer
+    // version of the CrateMover (9001) which can pick up multiple
+    // containers in one go, so instead of first in last out,
+    // we need to move all the container in one go..
+
+
+    // Iterate through all the lines with orders
+    for line in orders {
+        // Get the scheduled tuple
+        let (mov, from, to) = moving_schedule(line);
+        // Set the u8 values to characters.
+        let from_char = (from + b'0') as char;
+        let to_char = (to + b'0') as char;
+        // Move the amount of containers according to schedule
+        let mut crane = Vec::new();
+        for _ in 0..mov {
+            let container = stack.get_mut(&from_char).unwrap().pop().unwrap();
+            crane.push(container);
+        }
+        for container in crane.iter().rev() {
+            stack.get_mut(&to_char).unwrap().push(*container);
+        }
+    }
+    return stack
+    
+}
+
+fn get_puzzle_answer(mut stack: HashMap<char, Vec<char>>) -> String{
 
     let mut message = String::new();
     
@@ -95,5 +104,40 @@ fn main() {
         message.insert(i, stack.get_mut(&key).unwrap().pop().unwrap());
     }
 
-    println!("PART ONE: {message}")
+    return message
+}
+
+fn main() {
+
+    let contents = fs::read_to_string("puzzle.txt")
+        .expect("Something went wrong reading the file.");
+
+    let mut orders: Vec<&str> = Vec::new();
+    
+    // Read the first lines until whitespace
+    // to be able to create the puzzle stack
+    let mut stacks: Vec<&str> = Vec::new();
+    let mut order_flag = false;
+    for line in contents.lines() {
+        if order_flag {
+            orders.push(line)
+        } else {
+            if line.is_empty() {
+                order_flag = true;
+            } else {
+                stacks.push(line);
+            }
+        } 
+    }
+    let stack_one: HashMap<char, Vec<char>> = create_stacks(&stacks);
+    let stack_two: HashMap<char, Vec<char>> = create_stacks(&stacks);
+
+    let part_one = cratemover9000(&orders, stack_one);
+    let part_two = cratemover9001(&orders, stack_two);
+    
+    let part_one_answer = get_puzzle_answer(part_one);
+    let part_two_answer = get_puzzle_answer(part_two);
+
+    println!("PART ONE: {}", part_one_answer);
+    println!("PART TWO: {}", part_two_answer);
 }
