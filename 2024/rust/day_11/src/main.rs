@@ -1,6 +1,6 @@
 use std::{collections::HashMap, fs, usize};
 
-fn rule_two(stones: HashMap<usize, usize>) -> HashMap<usize, usize> {
+fn rule(stones: HashMap<usize, usize>) -> HashMap<usize, usize> {
     let mut new_stones: HashMap<usize, usize> = HashMap::new();
     for (stone, v) in stones {
         let stone_string = stone.to_string();
@@ -42,10 +42,10 @@ fn main() {
         part_one.entry(stone).and_modify(| x | *x += 1).or_insert(1);
     }
     for _ in 0..25 {
-        part_one = rule_two(part_one);
+        part_one = rule(part_one);
     }
     let score: usize = part_one.values().sum();
-    println!("PART TWO: {score:?}"); // 238317474993392
+    println!("PART ONE: {score:?}"); // 200446
     
     // Part two
     let mut part_two: HashMap<usize, usize> = HashMap::new();
@@ -53,7 +53,7 @@ fn main() {
         part_two.entry(stone).and_modify(| x | *x += 1).or_insert(1);
     }
     for _ in 0..75 {
-        part_two = rule_two(part_two);
+        part_two = rule(part_two);
     }
 
     let score: usize = part_two.values().sum();
