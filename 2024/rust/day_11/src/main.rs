@@ -1,25 +1,5 @@
 use std::{collections::HashMap, fs, usize};
 
-fn rule(stones: Vec<usize>) -> Vec<usize> {
-    let mut new_stones = Vec::new();
-    for stone in stones {
-        let stone_string = stone.to_string();
-        if stone == 0 {
-            new_stones.push(1);
-        } else if stone_string.len() % 2 == 0 {
-            let r = &stone_string[0..stone_string.len() / 2];
-            let l = &stone_string[stone_string.len() / 2..stone_string.len()];
-            new_stones.push(r.parse().unwrap());
-            new_stones.push(l.parse().unwrap());
-
-
-        } else {
-            new_stones.push(stone * 2024)
-        }
-    }
-    return new_stones;
-}
-
 fn rule_two(stones: HashMap<usize, usize>) -> HashMap<usize, usize> {
     let mut new_stones: HashMap<usize, usize> = HashMap::new();
     for (stone, v) in stones {
@@ -48,30 +28,34 @@ fn rule_two(stones: HashMap<usize, usize>) -> HashMap<usize, usize> {
 }
 
 fn main() {
-    let content = fs::read_to_string("puzzle.txt")
-        .expect("Did someone remove the file?");
 
-    let mut stones_one: Vec<usize> = content.clone().trim().split(" ")
-        .map(|x| x.parse().unwrap()).collect();
-    
-    for _ in 0..25 {
-        stones_one = rule(stones_one);
+    // Read puzzle to vector with each stone
+    let stones: Vec<usize> = fs::read_to_string("puzzle.txt")
+        .expect("Did someone remove the file?")
+        .trim().split(" ")
+        .map(|x| x.parse().unwrap())
+        .collect();
+
+    // Part one
+    let mut part_one: HashMap<usize, usize> = HashMap::new();
+    for stone in stones.clone() {
+        part_one.entry(stone).and_modify(| x | *x += 1).or_insert(1);
     }
-    println!("PART ONE: {}", stones_one.len()); // 200446
+    for _ in 0..25 {
+        part_one = rule_two(part_one);
+    }
+    let score: usize = part_one.values().sum();
+    println!("PART TWO: {score:?}"); // 238317474993392
     
-
-    let mut stones_two: Vec<usize> = content.clone().trim().split(" ")
-        .map(|x| x.parse().unwrap()).collect();
-
-    let mut stones: HashMap<usize, usize> = HashMap::new();
-    for stone in stones_two {
-        stones.entry(stone).and_modify(| x | *x += 1).or_insert(1);
+    // Part two
+    let mut part_two: HashMap<usize, usize> = HashMap::new();
+    for stone in stones {
+        part_two.entry(stone).and_modify(| x | *x += 1).or_insert(1);
     }
     for _ in 0..75 {
-        stones = rule_two(stones);
+        part_two = rule_two(part_two);
     }
 
-    let part_two: usize = stones.values().sum();
-
-    println!("PART TWO: {part_two:?}");
+    let score: usize = part_two.values().sum();
+    println!("PART TWO: {score:?}"); // 238317474993392
 }
