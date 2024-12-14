@@ -144,8 +144,7 @@ fn traverse(map: &mut Vec<Vec<Plot>>,
 fn get_price(garden: char,
     map:&mut Vec<Vec<Plot>>,
     row:&HashMap<usize, Vec<usize>>,
-    col:&HashMap<usize, Vec<usize>>,
-    part:usize) -> usize{
+    col:&HashMap<usize, Vec<usize>>) -> (usize, usize) {
 
     let mut filled_row = HashMap::<usize, Vec<usize>>::new();
     let mut filled_col = HashMap::<usize, Vec<usize>>::new();
@@ -176,49 +175,46 @@ fn get_price(garden: char,
             } 
         }
     }
-    if part == 2 {
-        let mut sides = 0;
-        for x in filled_row.keys().sorted() {
-            let row_v = filled_row[x].clone().into_iter().sorted().collect_vec();
-            let mut top_same = false;
-            let mut bot_same = false;
-            for (i, y) in row_v.clone().into_iter().enumerate() {
-                let col_for_row = filled_col[&y].clone().into_iter().sorted().collect_vec();
-                // check if garden exists above or beneath
-                // ABOVE:
-                if *x == 0 {
-                    check_side(&i, &y, &row_v, &mut sides, &mut top_same);
-                } else if !col_for_row.contains(&(x-1)) {
-                    check_side(&i, &y, &row_v, &mut sides, &mut top_same);
-                } else { top_same = false;}
-                // BELOW:
-                if !col_for_row.contains(&(x+1)) {
-                    check_side(&i, &y, &row_v, &mut sides, &mut bot_same);
-                } else { bot_same = false; }
-            }
+    let mut sides = 0;
+    for x in filled_row.keys().sorted() {
+        let row_v = filled_row[x].clone().into_iter().sorted().collect_vec();
+        let mut top_same = false;
+        let mut bot_same = false;
+        for (i, y) in row_v.clone().into_iter().enumerate() {
+            let col_for_row = filled_col[&y].clone().into_iter().sorted().collect_vec();
+            // check if garden exists above or beneath
+            // ABOVE:
+            if *x == 0 {
+                check_side(&i, &y, &row_v, &mut sides, &mut top_same);
+            } else if !col_for_row.contains(&(x-1)) {
+                check_side(&i, &y, &row_v, &mut sides, &mut top_same);
+            } else { top_same = false;}
+            // BELOW:
+            if !col_for_row.contains(&(x+1)) {
+                check_side(&i, &y, &row_v, &mut sides, &mut bot_same);
+            } else { bot_same = false; }
         }
-        for y in filled_col.keys().sorted() {
-            let col_v = filled_col[y].clone().into_iter().sorted().collect_vec();
-            let mut top_same = false;
-            let mut bot_same = false;
-            for (i, x) in col_v.clone().into_iter().enumerate() {
-                let row_for_col = filled_row[&x].clone().into_iter().sorted().collect_vec();
-                // check if garden exists above or beneath
-                // ABOVE:
-                if *y == 0 {
-                    check_side(&i, &x, &col_v, &mut sides, &mut top_same);
-                } else if !row_for_col.contains(&(y-1)) {
-                    check_side(&i, &x, &col_v, &mut sides, &mut top_same);
-                } else { top_same = false;}
-                // BELOW:
-                if !row_for_col.contains(&(y+1)) {
-                    check_side(&i, &x, &col_v, &mut sides, &mut bot_same);
-                } else { bot_same = false; }
-            }
-        }
-        return area*sides;
     }
-    return area*perimeter;
+    for y in filled_col.keys().sorted() {
+        let col_v = filled_col[y].clone().into_iter().sorted().collect_vec();
+        let mut top_same = false;
+        let mut bot_same = false;
+        for (i, x) in col_v.clone().into_iter().enumerate() {
+            let row_for_col = filled_row[&x].clone().into_iter().sorted().collect_vec();
+            // check if garden exists above or beneath
+            // ABOVE:
+            if *y == 0 {
+                check_side(&i, &x, &col_v, &mut sides, &mut top_same);
+            } else if !row_for_col.contains(&(y-1)) {
+                check_side(&i, &x, &col_v, &mut sides, &mut top_same);
+            } else { top_same = false;}
+            // BELOW:
+            if !row_for_col.contains(&(y+1)) {
+                check_side(&i, &x, &col_v, &mut sides, &mut bot_same);
+            } else { bot_same = false; }
+        }
+    }
+    return ((area*perimeter), (area*sides));
 }
 
 fn main() {
@@ -250,8 +246,9 @@ fn main() {
                 map[x][y].start = true;
                 println!("Starting to traverse {} at ({x:?}, {y:?})", map[x][y].garden);
                 (row, col) = traverse(&mut map, garden, x, y, row, col, '^');
-                price_one += get_price(garden, &mut map, &row, &col, 1);
-                price_two += get_price(garden, &mut map, &row, &col, 2);
+                let (p1, p2) = get_price(garden, &mut map, &row, &col);
+                price_one += p1;
+                price_two += p2;
             }
         }
     }
