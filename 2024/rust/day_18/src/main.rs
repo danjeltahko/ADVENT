@@ -91,8 +91,7 @@ fn main() {
     ).collect();
 
     let part_two_map: Vec<Vec<char>> = map.clone();
-
-    let mut graph: HashMap<(usize, usize), VecDeque<(usize,usize)>> = graph_creation(
+    let graph: HashMap<(usize, usize), VecDeque<(usize,usize)>> = graph_creation(
         &mut map, &falling_bytes, 0, start_bytes 
     );
     let parents: HashMap<(usize, usize), (usize, usize)> = bfs(start, end, graph);
@@ -100,49 +99,47 @@ fn main() {
     if parents.contains_key(&end) {
         let mut parent = parents[&end];
         loop {
+            path.push(parent);
             if parent == start {
                 break;
             } else {
                 parent = parents[&parent];
-                path.push(parent);
             }
         }
-        println!("PART ONE {}", path.len()); // 268
+        println!("PART ONE {}", path.len() - 1); // 268
     }
 
     // Iterate through the rest of the falling bytes..
-    for byte in start_bytes..falling_bytes.len() {
+    for i in start_bytes..falling_bytes.len() {
         // if a falling byte lands on the existing shortest path
         // then check if there is a path to the end position.
-        let foo = falling_bytes[byte];
-        // println!("Byte({byte:?}): {foo:?}");
-        if path.contains(&falling_bytes[byte]) {
-            // println!("Found a byte in path!!");
+        let byte = (falling_bytes[i].0+1, falling_bytes[i].1+1);
+        if path.contains(&byte) {
             // create a new graph
-            let mut graph: HashMap<(usize, usize), VecDeque<(usize,usize)>> = graph_creation(
-                &mut part_two_map.clone(), &falling_bytes, 0, byte
+            let mut new_map = part_two_map.clone();
+            let graph: HashMap<(usize, usize), VecDeque<(usize,usize)>> = graph_creation(
+                &mut new_map, &falling_bytes, 0, i + 1
             );
             // run bfs to find the shortest path
             let parents: HashMap<(usize, usize), (usize, usize)> = bfs(start, end, graph);
             // break and print the byte that landed so
             // we can't reach end postion..
             if !parents.contains_key(&end) {
-                let stop_byte = falling_bytes[byte];
-                println!("PART TWO: ({byte:?}) {stop_byte:?}");
-                // 18, 64
-                // 45, 32
-                // 33, 66
-                // 11, 64
+                let stop_byte = (falling_bytes[i].1, falling_bytes[i].0);
+                println!("PART TWO: {stop_byte:?}");
                 break
             } else {
                 path.clear();
+                path.push(end);
+                new_map[end.0][end.1] = '0';
                 let mut parent = parents[&end];
                 loop {
+                    path.push(parent);
+                    new_map[parent.0][parent.1] = '0';
                     if parent == start {
                         break;
                     } else {
                         parent = parents[&parent];
-                        path.push(parent);
                     }
                 }
             }
