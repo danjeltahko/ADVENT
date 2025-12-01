@@ -41,7 +41,11 @@ fn find_all(matches: HashMap<usize, Vec<usize>>, size: usize) -> usize {
         if !visited.contains(&node) && matches.contains_key(&node) {
             for n in matches[&node].clone() {
                 parents.entry(n)
-                    .and_modify(|x| x.push(node))
+                    .and_modify(|x| 
+                        if !x.contains(&node) {
+                            x.push(node)
+                        }
+                    )
                     .or_insert(vec![node]);
                 queue.push_back(n);
             }
@@ -61,7 +65,7 @@ fn find_all(matches: HashMap<usize, Vec<usize>>, size: usize) -> usize {
             for n in parents[&i].clone() {
                 let cost = paths[&n];
                 paths.entry(i)
-                    .and_modify(|mut x| *x += cost)
+                    .and_modify(|x| *x += cost)
                     .or_insert(cost);
             }
         }
@@ -98,7 +102,7 @@ fn main() {
             for m in re.find_iter(&design) {
                 // println!("{m:?}");
                 matches.entry(m.start())
-                    .and_modify(|v| v.push(m.end()))
+                    .and_modify(|v| if !v.contains(&m.end().clone()) { v.push(m.end()) })
                     .or_insert(vec![m.end()]);
             }
         }
@@ -112,11 +116,12 @@ fn main() {
             let patterns = find_all(matches.clone(), design.len());
             println!("{patterns:?} found for {design:?}!");
             possible_patterns += patterns;
-            break;
+            // break;
         }
     }
     println!("PART ONE: {possible:?}"); // 322
     println!("PART TWO: {possible_patterns:?}");
     // too low 17301345680744
     // too low 491870080144208
+    // ------- 491870080144208
 }

@@ -101,31 +101,31 @@ fn main() {
     safety_factor *= fourth;
     println!("\nPART ONE: {safety_factor:?}"); // 229069152
 
-    let mut new_map: Vec<Vec<char>> = Vec::new();
-    for _ in 0..space.0 {
-        let mut row = vec![];
-        for _ in 0..space.1 {
-            row.push(' ');
-        }
-        new_map.push(row);
-    }
-    // I found a line at iteration 9, and every 101 iteration.
-    // therefore i just tried with step 101 and found the tree
-    // at iteration 7382, but it was of course 7383.. :)
-    for i in (9..9000).step_by(101) {
-        let mut christmas_map = new_map.clone(); 
-        for m in &movement {
-            let new_pos: (i32, i32) = move_robot(map.clone(), m[0].clone(), m[1].clone(), i+1 as i32);
-            christmas_map[new_pos.0 as usize][new_pos.1 as usize] = '#';
-        }
-        println!("--------------------------------------------------------------------------");
-        println!("Iteration: {i:?}");
-        for line in christmas_map {
-            for c in line {
-                print!("{}", c);
-            }
-            println!("");
-        }
-        println!("\n")
-    }
+    // let mut new_map: Vec<Vec<char>> = Vec::new();
+    // for _ in 0..space.0 {
+    //     let mut row = vec![];
+    //     for _ in 0..space.1 {
+    //         row.push(' ');
+    //     }
+    //     new_map.push(row);
+    // }
+    // // I found a line at iteration 9, and every 101 iteration.
+    // // therefore i just tried with step 101 and found the tree
+    // // at iteration 7382, but it was of course 7383.. :)
+    // for i in (9..7383).step_by(101) {
+    //     let mut christmas_map = new_map.clone(); 
+    //     for m in &movement {
+    //         let new_pos: (i32, i32) = move_robot(map.clone(), m[0].clone(), m[1].clone(), i+1 as i32);
+    //         christmas_map[new_pos.0 as usize][new_pos.1 as usize] = '#';
+    //     }
+    //     println!("--------------------------------------------------------------------------");
+    //     println!("Iteration: {i:?}");
+    //     for line in christmas_map {
+    //         for c in line {
+    //             print!("{}", c);
+    //         }
+    //         println!("");
+    //     }
+    //     println!("\n")
+    // }
 }
